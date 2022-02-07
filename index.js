@@ -2,23 +2,29 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 
+import MySqlConnection from "./mySqlConnection";
+import configData from "./config.json";
+
 const app = express();
 app.use(cors());
 
 app.use(bodyParser.json());
 
-app.get("/greet", (req, res) => {
-  res.status(200).json({ Name: "Test" });
-});
+let conn = new MySqlConnection(
+    configData.serverName,
+    configData.databaseName,
+    configData.userName,
+    configData.password
+  );
 
 app.post("/login", (req, res) => {
   //login employee
-  if (req.body.EmployeeName === "ABC" && req.body.EmployeePassword === "123") {
-    res.status(200).json({ isLoginSuccess: true });
-  } else {
-    res.status(200).json({ isLoginSuccess: false });
-  }
+  conn.login(req, res);
 });
+
+app.get("/employees", (req, res) => {
+    conn.getAll(req, res);
+})
 
 //   app.get("/employees/:id", (req, res) => {
 //     //get employee by name
